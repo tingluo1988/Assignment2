@@ -1,0 +1,132 @@
+---
+title: "Module 3 Homework"
+author: "Ting Luo"
+date: "April 25, 2016"
+output: html_document
+---
+
+```{r}
+```
+# Reclassifying OTUs with Silva
+
+### Classification step indicated in bold
+
+make.contigs(file=stability.files, processors=8)
+
+summary.seqs(fasta=stability.trim.contigs.fasta)
+
+screen.seqs(fasta=stability.trim.contigs.fasta, group=stability.contigs.groups, maxambig=0, maxlength=275)
+
+unique.seqs(fasta=stability.trim.contigs.good.fasta)
+
+count.seqs(name=stability.trim.contigs.good.names, group=stability.contigs.good.groups)
+
+summary.seqs(count=stability.trim.contigs.good.count_table)
+
+pcr.seqs(fasta=silva.bacteria.fasta, start=11894, end=25319, keepdots=F, processors=8)
+
+system(mv silva.bacteria.pcr.fasta silva.v4.fasta)
+
+summary.seqs(fasta=silva.v4.fasta)
+
+align.seqs(fasta=stability.trim.contigs.good.unique.fasta, reference=silva.v4.fasta)
+
+summary.seqs(fasta=stability.trim.contigs.good.unique.align, count=stability.trim.contigs.good.count_table)
+
+screen.seqs(fasta=stability.trim.contigs.good.unique.align, count=stability.trim.contigs.good.count_table, summary=stability.trim.contigs.good.unique.summary, start=1968, end=11550, maxhomop=8)
+
+summary.seqs(fasta=current, count=current)
+
+filter.seqs(fasta=stability.trim.contigs.good.unique.good.align, vertical=T, trump=.)
+
+unique.seqs(fasta=stability.trim.contigs.good.unique.good.filter.fasta, count=stability.trim.contigs.good.good.count_table)
+
+pre.cluster(fasta=stability.trim.contigs.good.unique.good.filter.unique.fasta, count=stability.trim.contigs.good.unique.good.filter.count_table, diffs=2)
+
+chimera.uchime(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.count_table, dereplicate=t)
+
+remove.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.fasta, accnos=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.accnos)
+
+summary.seqs(fasta=current, count=current)
+
+classify.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.count_table, reference=**silva.bacteria.fasta**, taxonomy=**silva.bacteria.silva.tax**, cutoff=80)
+
+remove.lineage(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.count_table, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.taxonomy, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota)
+
+get.groups(count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta, groups=Mock)
+
+seq.error(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, reference=HMP_MOCK.v35.fasta, aligned=F)
+
+dist.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, cutoff=0.20)
+
+cluster(column=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.dist, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table)
+
+make.shared(list=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.list, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, label=0.03)
+
+rarefaction.single(shared=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.shared)
+
+remove.groups(count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.pick.taxonomy, groups=Mock)
+
+dist.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, cutoff=0.20)
+
+cluster(column=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.dist, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table)
+
+cluster.split(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.pick.pick.taxonomy, splitmethod=classify, taxlevel=4, cutoff=0.15)
+
+make.shared(list=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.list, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, label=0.03)
+
+classify.otu(list=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.list, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table, taxonomy=stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.silva.wang.pick.pick.taxonomy, label=0.03)
+
+system(mv stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.shared stability.an.shared)
+
+system(mv stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.pick.an.unique_list.0.03.cons.taxonomy stability.an.cons.taxonomy)
+
+count.groups(shared=stability.an.shared)
+
+sub.sample(shared=stability.an.shared, size=2439)
+
+rarefaction.single(shared=stability.an.shared, calc=sobs, freq=100)
+
+summary.single(shared=stability.an.shared, calc=nseqs-coverage-sobs-invsimpson, subsample=2441)
+
+heatmap.bin(shared=stability.an.0.03.subsample.shared, scale=log2, numotu=50) 
+
+dist.shared(shared=stability.an.shared, calc=thetayc-jclass, subsample=2241)
+
+heatmap.sim(phylip=stability.an.thetayc.0.03.lt.ave.dist)
+
+heatmap.sim(phylip=stability.an.jclass.0.03.lt.ave.dist)
+
+venn(shared=stability.an.0.03.subsample.shared, groups=F3D0-F3D1-F3D2-F3D3)
+
+tree.shared(phylip=stability.an.thetayc.0.03.lt.ave.dist)
+
+parsimony(tree=stability.an.thetayc.0.03.lt.ave.tre, group=mouse.time.design,  groups=all)
+
+pcoa(phylip=stability.an.thetayc.0.03.lt.ave.dist)
+
+nmds(phylip=stability.an.thetayc.0.03.lt.ave.dist)
+
+nmds(phylip=stability.an.thetayc.0.03.lt.ave.dist, mindim=3, maxdim=3)
+
+# PCOA plots PDS vs. Silva
+
+```{r, echo=FALSE}
+pcoa_silva <- read.table(file="C:/Users/Ting Luo/Desktop/mothur_workshop_silva/stability.an.thetayc.0.03.lt.ave.pcoa.axes", header=T)
+
+head(pcoa_silva)
+```
+# PDS
+```{r, echo=FALSE}
+plot(pcoa_silva$axis1, pcoa_silva$axis2, pch=19)
+
+pcoa_pds <- read.table(file="C:/Users/Ting Luo/Desktop/mothur_workshop/stability.an.thetayc.0.03.lt.ave.pcoa.axes", header=T)
+
+head(pcoa_pds)
+```
+# Silva
+```{r, echo=FALSE}
+plot(pcoa_pds$axis1, pcoa_pds$axis2, pch=19)
+```
+
+**There is no difference in the PCOA plots between PDS-classified OTUs and Silva-classified OTUs.This makes sense because classification is simply assigning taxonomic names to OTUs.**
